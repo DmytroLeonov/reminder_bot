@@ -1,1 +1,1 @@
-from .config import bot
+from src.bot.commands import bot
