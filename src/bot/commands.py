@@ -8,6 +8,7 @@ from src.scheduler import scheduler
 from apscheduler.triggers.cron import CronTrigger
 
 import uuid
+from datetime import datetime
 
 
 @bot.message_handler(commands=["start"])
@@ -15,6 +16,29 @@ def start(message: Message) -> None:
     bot.send_message(
         chat_id=message.chat.id,
         text="Hello! Send me a task you want to be reminded of."
+    )
+
+
+@bot.message_handler(commands=["list"])
+def list_tasks(message: Message) -> None:
+    jobs = scheduler.get_jobs()
+    if not jobs:
+        bot.send_message(
+            message.chat.id,
+            "You have no tasks scheduled."
+        )
+        return
+
+    job_list: list[str] = []
+
+    for job in jobs:
+        next_run_time = job.next_run_time.strftime("%Y-%m-%d %H:%M")
+        task_message = job.kwargs["task_message"]
+        job_list.append(f"[{next_run_time}] - {task_message}")
+
+    bot.send_message(
+        chat_id=message.chat.id,
+        text="\n".join(job_list)
     )
 
 
