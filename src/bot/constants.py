@@ -1,14 +1,14 @@
 from telebot import formatting
 
 CRON_FORMAT = formatting.hcode(
-    "Input cron string according to the format or 'c' to cancel"
-    "┌───────  minute (0–59)"
-    "│ ┌───────  hour (0–23)"
-    "│ │ ┌─────── day/month (1–31)"
-    "│ │ │ ┌──────── month (1-12)"
-    "│ │ │ │ ┌───────── day/week"
-    "│ │ │ │ │    (0–6, sun-sat)"
-    "│ │ │ │ │"
+    "Input cron string according to the format or 'c' to cancel\n"
+    "┌───────  minute (0–59)\n"
+    "│ ┌───────  hour (0–23)\n"
+    "│ │ ┌─────── day/month (1–31)\n"
+    "│ │ │ ┌──────── month (1-12)\n"
+    "│ │ │ │ ┌───────── day/week\n"
+    "│ │ │ │ │    (0–6, sun-sat)\n"
+    "│ │ │ │ │\n"
     "* * * * *"
 )
 

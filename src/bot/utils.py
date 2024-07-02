@@ -45,6 +45,12 @@ def delete_callback(job_id: str) -> str:
     return f"{constants.DELETE_TASK_PREFIX}{job_id}"
 
 
+def inline_keyboard_delete_button(job_id: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(
+        text="❌", callback_data=delete_callback(job_id)
+    )
+
+
 def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
     markup = InlineKeyboardMarkup(row_width=2)
     for job in jobs:
@@ -57,9 +63,7 @@ def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
         edit_button = InlineKeyboardButton(
             text="✏️", callback_data=edit_callback(job.id)
         )
-        delete_button = InlineKeyboardButton(
-            text="❌", callback_data=delete_callback(job.id)
-        )
+        delete_button = inline_keyboard_delete_button(job.id)
 
         markup.row(task_button)
         markup.row(edit_button, delete_button)

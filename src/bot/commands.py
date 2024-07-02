@@ -3,7 +3,9 @@ from datetime import datetime
 from src.bot import constants
 from src.bot.config import bot
 from src.bot.jobs import send_task_reminder
-from src.bot.utils import new_uuid, generate_list_markup, get_crontab
+from src.bot.utils import (
+    new_uuid, generate_list_markup, get_crontab, inline_keyboard_delete_button
+)
 
 from src.scheduler import scheduler
 
@@ -11,7 +13,7 @@ from apscheduler.triggers.cron import CronTrigger
 from apscheduler.jobstores.base import JobLookupError
 
 from telebot import formatting
-from telebot.types import Message, CallbackQuery
+from telebot.types import Message, CallbackQuery, InlineKeyboardMarkup
 
 
 @bot.message_handler(commands=["start"])
@@ -66,8 +68,7 @@ def task_info(query: CallbackQuery) -> None:
     job = scheduler.get_job(job_id)
     if not job:
         bot.answer_callback_query(
-            chat_id=query.message.chat.id,
-            message_id=query.message.id,
+            callback_query_id=query.id,
             text=constants.TASK_NOT_FOUND
         )
         return
@@ -75,14 +76,17 @@ def task_info(query: CallbackQuery) -> None:
     task_message = job.kwargs["task_message"]
     next_run_time = datetime.strftime(job.next_run_time, "%Y-%m-%d %H:%M")
     crontab = get_crontab(job.trigger)
-    bot.edit_message_text(
+    markup = InlineKeyboardMarkup(row_width=1)
+    delete_button = inline_keyboard_delete_button(job_id)
+    markup.add(delete_button)
+    bot.send_message(
         chat_id=query.message.chat.id,
-        message_id=query.message.id,
         text=(
             f"{task_message}\n"
             f"{formatting.hbold("Next run time")}: {next_run_time}\n"
             f"{formatting.hbold("Crontab")}: {crontab}"
         ),
+        reply_markup=markup,
         parse_mode="HTML"
     )
 
