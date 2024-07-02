@@ -1,13 +1,16 @@
+from datetime import datetime
+
 from src.bot import constants
 from src.bot.config import bot
 from src.bot.jobs import send_task_reminder
-from src.bot.utils import new_uuid, generate_list_markup
+from src.bot.utils import new_uuid, generate_list_markup, get_crontab
 
 from src.scheduler import scheduler
 
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.jobstores.base import JobLookupError
 
+from telebot import formatting
 from telebot.types import Message, CallbackQuery
 
 
@@ -52,6 +55,35 @@ def delete_task(query: CallbackQuery) -> None:
         chat_id=query.message.chat.id,
         message_id=query.message.id,
         reply_markup=markup
+    )
+
+
+@bot.callback_query_handler(
+    func=lambda query: query.data.startswith(constants.INFO_TASK_PREFIX)
+)
+def task_info(query: CallbackQuery) -> None:
+    job_id = query.data.split("_")[1]
+    job = scheduler.get_job(job_id)
+    if not job:
+        bot.answer_callback_query(
+            chat_id=query.message.chat.id,
+            message_id=query.message.id,
+            text=constants.TASK_NOT_FOUND
+        )
+        return
+
+    task_message = job.kwargs["task_message"]
+    next_run_time = datetime.strftime(job.next_run_time, "%Y-%m-%d %H:%M")
+    crontab = get_crontab(job.trigger)
+    bot.edit_message_text(
+        chat_id=query.message.chat.id,
+        message_id=query.message.id,
+        text=(
+            f"{task_message}\n"
+            f"{formatting.hbold("Next run time")}: {next_run_time}\n"
+            f"{formatting.hbold("Crontab")}: {crontab}"
+        ),
+        parse_mode="HTML"
     )
 
 

@@ -5,7 +5,9 @@ import uuid
 from src.bot import constants
 
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+
 from apscheduler.job import Job
+from apscheduler.triggers.cron import CronTrigger
 
 
 def new_uuid() -> str:
@@ -63,3 +65,14 @@ def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
         markup.row(edit_button, delete_button)
 
     return markup
+
+
+def get_crontab(trigger: CronTrigger):
+    fields = trigger.fields
+    minute = fields[CronTrigger.FIELD_NAMES.index("minute")]
+    hour = fields[CronTrigger.FIELD_NAMES.index("hour")]
+    day = fields[CronTrigger.FIELD_NAMES.index("day")]
+    month = fields[CronTrigger.FIELD_NAMES.index("month")]
+    day_of_week = fields[CronTrigger.FIELD_NAMES.index("day_of_week")]
+
+    return f"{minute} {hour} {day} {month} {day_of_week}"
