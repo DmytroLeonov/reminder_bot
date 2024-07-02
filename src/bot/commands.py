@@ -28,7 +28,9 @@ def list_tasks(message: Message) -> None:
     )
 
 
-@bot.callback_query_handler(func=lambda query: query.data.startswith("delete_"))
+@bot.callback_query_handler(
+    func=lambda query: query.data.startswith(constants.DELETE_TASK_PREFIX)
+)
 def delete_task(query: CallbackQuery) -> None:
     job_id = query.data.split("_")[1]
     scheduler.remove_job(job_id)

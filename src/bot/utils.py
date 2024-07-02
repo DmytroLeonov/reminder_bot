@@ -2,6 +2,8 @@ from datetime import datetime
 from pytz import timezone
 import uuid
 
+from src.bot import constants
+
 from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
 from apscheduler.job import Job
 
@@ -30,15 +32,15 @@ def from_now(time: datetime) -> str:
 
 
 def info_callback(job_id: str) -> str:
-    return f"info_{job_id}"
+    return f"{constants.INFO_TASK_PREFIX}{job_id}"
 
 
 def edit_callback(job_id: str) -> str:
-    return f"edit_{job_id}"
+    return f"{constants.EDIT_TASK_PREFIX}{job_id}"
 
 
 def delete_callback(job_id: str) -> str:
-    return f"delete_{job_id}"
+    return f"{constants.DELETE_TASK_PREFIX}{job_id}"
 
 
 def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
