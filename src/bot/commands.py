@@ -6,6 +6,7 @@ from src.bot.utils import new_uuid, generate_list_markup
 from src.scheduler import scheduler
 
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.jobstores.base import JobLookupError
 
 from telebot.types import Message, CallbackQuery
 
@@ -33,15 +34,18 @@ def list_tasks(message: Message) -> None:
 )
 def delete_task(query: CallbackQuery) -> None:
     job_id = query.data.split("_")[1]
-    scheduler.remove_job(job_id)
-
-    jobs = scheduler.get_jobs()
-    if not jobs:
-        bot.delete_message(
-            chat_id=query.message.chat.id,
-            message_id=query.message.id
-        )
-        return
+    try:
+        scheduler.remove_job(job_id)
+    except JobLookupError:
+        pass
+    finally:
+        jobs = scheduler.get_jobs()
+        if not jobs:
+            bot.delete_message(
+                chat_id=query.message.chat.id,
+                message_id=query.message.id
+            )
+            return
 
     markup = generate_list_markup(jobs)
     bot.edit_message_reply_markup(
