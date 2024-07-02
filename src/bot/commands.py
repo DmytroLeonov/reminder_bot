@@ -1,15 +1,13 @@
 from src.bot import constants
 from src.bot.config import bot
 from src.bot.jobs import send_task_reminder
-from src.bot.utils import (
-    new_uuid, from_now, edit_callback, delete_callback, info_callback
-)
+from src.bot.utils import new_uuid, generate_list_markup
 
 from src.scheduler import scheduler
 
 from apscheduler.triggers.cron import CronTrigger
 
-from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import Message, CallbackQuery
 
 
 @bot.message_handler(commands=["start"])
@@ -24,26 +22,30 @@ def list_tasks(message: Message) -> None:
         bot.send_message(chat_id=message.chat.id, text=constants.NO_TASKS)
         return
 
-    markup = InlineKeyboardMarkup(row_width=2)
-    for job in jobs:
-        time_left = from_now(job.next_run_time)
-        task_message = job.kwargs["task_message"]
-        text = f"{time_left}: {task_message}"
-        task_button = InlineKeyboardButton(
-            text=text, callback_data=info_callback(job.id)
-        )
-        edit_button = InlineKeyboardButton(
-            text="✏️", callback_data=edit_callback(job.id)
-        )
-        delete_button = InlineKeyboardButton(
-            text="❌", callback_data=delete_callback(job.id)
-        )
-
-        markup.row(task_button)
-        markup.row(edit_button, delete_button)
-
+    markup = generate_list_markup(jobs)
     bot.send_message(
         chat_id=message.chat.id, text=constants.YOUR_TASKS, reply_markup=markup
+    )
+
+
+@bot.callback_query_handler(func=lambda query: query.data.startswith("delete_"))
+def delete_task(query: CallbackQuery) -> None:
+    job_id = query.data.split("_")[1]
+    scheduler.remove_job(job_id)
+
+    jobs = scheduler.get_jobs()
+    if not jobs:
+        bot.delete_message(
+            chat_id=query.message.chat.id,
+            message_id=query.message.id
+        )
+        return
+
+    markup = generate_list_markup(jobs)
+    bot.edit_message_reply_markup(
+        chat_id=query.message.chat.id,
+        message_id=query.message.id,
+        reply_markup=markup
     )
 
 
