@@ -1,7 +1,9 @@
 from src.bot import constants
 from src.bot.config import bot
 from src.bot.jobs import send_task_reminder
-from src.bot.utils import new_uuid
+from src.bot.utils import (
+    new_uuid, from_now, edit_callback, delete_callback, info_callback
+)
 
 from src.scheduler import scheduler
 
@@ -24,12 +26,18 @@ def list_tasks(message: Message) -> None:
 
     markup = InlineKeyboardMarkup(row_width=2)
     for job in jobs:
+        time_left = from_now(job.next_run_time)
         task_message = job.kwargs["task_message"]
+        text = f"{time_left}: {task_message}"
         task_button = InlineKeyboardButton(
-            text=task_message, callback_data=f"info_{job.id}"
+            text=text, callback_data=info_callback(job.id)
         )
-        edit_button = InlineKeyboardButton(text="✏️", callback_data=f"edit_{job.id}")
-        delete_button = InlineKeyboardButton(text="❌", callback_data=f"delete_{job.id}")
+        edit_button = InlineKeyboardButton(
+            text="✏️", callback_data=edit_callback(job.id)
+        )
+        delete_button = InlineKeyboardButton(
+            text="❌", callback_data=delete_callback(job.id)
+        )
 
         markup.row(task_button)
         markup.row(edit_button, delete_button)
