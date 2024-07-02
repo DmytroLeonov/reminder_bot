@@ -7,7 +7,7 @@ from src.scheduler import scheduler
 
 from apscheduler.triggers.cron import CronTrigger
 
-from telebot.types import Message
+from telebot.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
 
 @bot.message_handler(commands=["start"])
@@ -22,15 +22,21 @@ def list_tasks(message: Message) -> None:
         bot.send_message(chat_id=message.chat.id, text=constants.NO_TASKS)
         return
 
-    job_list: list[str] = []
-
+    markup = InlineKeyboardMarkup(row_width=2)
     for job in jobs:
-        next_run_time = job.next_run_time.strftime("%Y-%m-%d %H:%M")
         task_message = job.kwargs["task_message"]
-        job_list.append(f"[{next_run_time}] - {task_message}")
+        task_button = InlineKeyboardButton(
+            text=task_message, callback_data=f"info_{job.id}"
+        )
+        edit_button = InlineKeyboardButton(text="✏️", callback_data=f"edit_{job.id}")
+        delete_button = InlineKeyboardButton(text="❌", callback_data=f"delete_{job.id}")
 
-    text = "\n".join(job_list)
-    bot.send_message(chat_id=message.chat.id, text=text)
+        markup.row(task_button)
+        markup.row(edit_button, delete_button)
+
+    bot.send_message(
+        chat_id=message.chat.id, text=constants.YOUR_TASKS, reply_markup=markup
+    )
 
 
 @bot.message_handler(func=lambda message: True)
