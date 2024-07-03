@@ -16,14 +16,17 @@ def new_uuid() -> str:
 
 def from_now(time: datetime) -> str:
     td = time - datetime.now(tz=timezone("Europe/Sofia"))
-    seconds = td.seconds
+    seconds = int(td.total_seconds())
     minutes = seconds // 60
     hours = minutes // 60
     days = hours // 24
+    months = days // 30
     years = days // 365
 
     if years > 0:
         return f"{years}y"
+    if months > 0:
+        return f"{months}mo"
     if days > 0:
         return f"{days}d"
     if hours > 0:
