@@ -5,9 +5,10 @@ CRON_FORMAT = formatting.hcode(
     "┌───────  minute (0–59)\n"
     "│ ┌───────  hour (0–23)\n"
     "│ │ ┌─────── day/month (1–31)\n"
-    "│ │ │ ┌──────── month (1-12)\n"
+    "│ │ │ ┌───────── month\n"
+    "│ │ │ │     (1-12, jan-dec)\n"
     "│ │ │ │ ┌───────── day/week\n"
-    "│ │ │ │ │    (0–6, sun-sat)\n"
+    "│ │ │ │ │    (0–6, mon-sun)\n"
     "│ │ │ │ │\n"
     "* * * * *"
 )
