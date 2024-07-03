@@ -83,8 +83,8 @@ def task_info(query: CallbackQuery) -> None:
         chat_id=query.message.chat.id,
         text=(
             f"{task_message}\n"
-            f"{formatting.hbold("Next run time")}: {next_run_time}\n"
-            f"{formatting.hbold("Crontab")}: {crontab}"
+            f"{formatting.hbold('Next run time')}: {next_run_time}\n"
+            f"{formatting.hbold('Crontab')}: {crontab}"
         ),
         reply_markup=markup,
         parse_mode="HTML"
