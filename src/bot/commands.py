@@ -4,7 +4,11 @@ from src.bot import constants
 from src.bot.config import bot
 from src.bot.jobs import send_task_reminder
 from src.bot.utils import (
-    new_uuid, generate_list_markup, get_crontab, inline_keyboard_delete_button
+    new_uuid,
+    get_crontab,
+    generate_list_markup,
+    inline_keyboard_delete_button,
+    inline_keyboard_back_button
 )
 
 from src.scheduler import scheduler
@@ -34,6 +38,26 @@ def list_tasks(message: Message) -> None:
     )
 
 
+@bot.callback_query_handler(func=lambda query: query.data == constants.LIST_CALLBACK)
+def list_tasks_callback(query: CallbackQuery) -> None:
+    jobs = scheduler.get_jobs()
+    if not jobs:
+        bot.edit_message_text(
+            chat_id=query.message.chat.id,
+            text=constants.NO_TASKS,
+            reply_markup=InlineKeyboardMarkup()
+        )
+        return
+
+    markup = generate_list_markup(jobs)
+    bot.edit_message_text(
+        chat_id=query.message.chat.id,
+        message_id=query.message.id,
+        text=constants.YOUR_TASKS,
+        reply_markup=markup
+    )
+
+
 @bot.callback_query_handler(
     func=lambda query: query.data.startswith(constants.DELETE_TASK_PREFIX)
 )
@@ -53,9 +77,10 @@ def delete_task(query: CallbackQuery) -> None:
             return
 
     markup = generate_list_markup(jobs)
-    bot.edit_message_reply_markup(
+    bot.edit_message_text(
         chat_id=query.message.chat.id,
         message_id=query.message.id,
+        text=constants.YOUR_TASKS,
         reply_markup=markup
     )
 
@@ -76,11 +101,13 @@ def task_info(query: CallbackQuery) -> None:
     task_message = job.kwargs["task_message"]
     next_run_time = datetime.strftime(job.next_run_time, "%Y-%m-%d %H:%M")
     crontab = get_crontab(job.trigger)
-    markup = InlineKeyboardMarkup(row_width=1)
+    markup = InlineKeyboardMarkup(row_width=2)
+    back_button = inline_keyboard_back_button()
     delete_button = inline_keyboard_delete_button(job_id)
-    markup.add(delete_button)
-    bot.send_message(
+    markup.add(back_button, delete_button)
+    bot.edit_message_text(
         chat_id=query.message.chat.id,
+        message_id=query.message.id,
         text=(
             f"{task_message}\n"
             f"{formatting.hbold('Next run time')}: {next_run_time}\n"

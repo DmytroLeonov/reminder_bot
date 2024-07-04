@@ -17,6 +17,8 @@ INFO_TASK_PREFIX = "info_"
 EDIT_TASK_PREFIX = "edit_"
 DELETE_TASK_PREFIX = "delete_"
 
+LIST_CALLBACK = "list"
+
 CANCEL_COMMAND = "c"
 
 NO_BOT_TOKEN = "No Telegram bot token found in env"

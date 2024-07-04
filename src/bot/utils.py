@@ -49,13 +49,15 @@ def delete_callback(job_id: str) -> str:
 
 
 def inline_keyboard_delete_button(job_id: str) -> InlineKeyboardButton:
-    return InlineKeyboardButton(
-        text="❌", callback_data=delete_callback(job_id)
-    )
+    return InlineKeyboardButton(text="❌", callback_data=delete_callback(job_id))
+
+
+def inline_keyboard_back_button() -> InlineKeyboardButton:
+    return InlineKeyboardButton(text="◀️", callback_data=constants.LIST_CALLBACK)
 
 
 def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
-    markup = InlineKeyboardMarkup(row_width=2)
+    markup = InlineKeyboardMarkup(row_width=1)
     for job in jobs:
         time_left = from_now(job.next_run_time)
         task_message = job.kwargs["task_message"]
@@ -63,13 +65,7 @@ def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:
         task_button = InlineKeyboardButton(
             text=text, callback_data=info_callback(job.id)
         )
-        edit_button = InlineKeyboardButton(
-            text="✏️", callback_data=edit_callback(job.id)
-        )
-        delete_button = inline_keyboard_delete_button(job.id)
-
-        markup.row(task_button)
-        markup.row(edit_button, delete_button)
+        markup.add(task_button)
 
     return markup
 
