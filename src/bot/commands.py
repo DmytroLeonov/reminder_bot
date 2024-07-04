@@ -110,7 +110,7 @@ def choose_time(message: Message, *, task_message: str) -> None:
         return
 
     try:
-        trigger = CronTrigger.from_crontab(crontab)
+        trigger = CronTrigger.from_crontab(crontab, timezone=scheduler.timezone)
     except ValueError:
         bot.send_message(
             chat_id=message.chat.id, text=constants.INVALID_CRON_FORMAT
