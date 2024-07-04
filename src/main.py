@@ -1,12 +1,9 @@
 import sys
-import logging
-from src.scheduler import scheduler
 
-# Load environment variables before the modules that use them
+# Load environment variables and setup logger before importing the modules that use them
+import logging
 from dotenv import load_dotenv
 load_dotenv()
-
-from src.bot import bot  # noqa: E402
 
 logging.basicConfig(
     stream=sys.stdout,
@@ -16,10 +13,12 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+from src.bot import bot  # noqa: E402
+from src.scheduler import scheduler  # noqa: E402
+
 
 def main():
     scheduler.start()
-
     logger.info('Starting the bot...')
     bot.infinity_polling()
 

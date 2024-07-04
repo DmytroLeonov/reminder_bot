@@ -13,6 +13,8 @@ CRON_FORMAT = formatting.hcode(
     "* * * * *"
 )
 
+COMMAND_NOT_ALLOWED = "You are not allowed to use this command."
+
 INFO_TASK_PREFIX = "info_"
 EDIT_TASK_PREFIX = "edit_"
 DELETE_TASK_PREFIX = "delete_"
@@ -21,7 +23,8 @@ LIST_CALLBACK = "list"
 
 CANCEL_COMMAND = "c"
 
-NO_BOT_TOKEN = "No Telegram bot token found in env"
+NO_BOT_TOKEN = "No BOT_TOKEN found in env."
+ADMIN_CHAT_ID = "No ADMIN_CHAT_ID found in env. You won't be able to use all features."
 
 START_RESPONSE = "Hello! Send me a task you want to be reminded of."
 NO_TASKS = "You have no tasks scheduled."

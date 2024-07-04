@@ -10,6 +10,7 @@ from src.bot.utils import (
     inline_keyboard_delete_button,
     inline_keyboard_back_button
 )
+from src.bot.security import admin_only
 
 from src.scheduler import scheduler
 
@@ -25,7 +26,13 @@ def start(message: Message) -> None:
     bot.send_message(chat_id=message.chat.id, text=constants.START_RESPONSE)
 
 
+@bot.message_handler(commands=["my_id"])
+def get_user_id(message: Message) -> None:
+    bot.send_message(chat_id=message.chat.id, text=message.from_user.id)
+
+
 @bot.message_handler(commands=["list"])
+@admin_only
 def list_tasks(message: Message) -> None:
     jobs = scheduler.get_jobs()
     if not jobs:
@@ -119,6 +126,7 @@ def task_info(query: CallbackQuery) -> None:
 
 
 @bot.message_handler(func=lambda message: True)
+@admin_only
 def add_task(message: Message) -> None:
     bot.send_message(
         chat_id=message.chat.id, text=constants.CRON_FORMAT, parse_mode="HTML"
