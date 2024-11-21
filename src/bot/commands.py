@@ -11,9 +11,10 @@ from src.bot.utils import (
     inline_keyboard_back_button,
     extract_job_id
 )
-from src.bot.security import admin_only
+from src.bot.security import protected
 
 from src.scheduler import scheduler
+from src.scheduler.utils import get_jobs
 
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.jobstores.base import JobLookupError
@@ -33,9 +34,9 @@ def get_user_id(message: Message) -> None:
 
 
 @bot.message_handler(commands=["list"])
-@admin_only
+@protected
 def list_tasks(message: Message) -> None:
-    jobs = scheduler.get_jobs()
+    jobs = get_jobs(message.chat.id)
     if not jobs:
         bot.send_message(chat_id=message.chat.id, text=constants.NO_TASKS)
         return
@@ -48,7 +49,7 @@ def list_tasks(message: Message) -> None:
 
 @bot.callback_query_handler(func=lambda query: query.data == constants.LIST_CALLBACK)
 def list_tasks_callback(query: CallbackQuery) -> None:
-    jobs = scheduler.get_jobs()
+    jobs = get_jobs(query.message.chat.id)
     if not jobs:
         bot.edit_message_text(
             chat_id=query.message.chat.id,
@@ -76,7 +77,7 @@ def delete_task(query: CallbackQuery) -> None:
     except JobLookupError:
         pass
     finally:
-        jobs = scheduler.get_jobs()
+        jobs = get_jobs(query.message.chat.id)
         if not jobs:
             bot.delete_message(
                 chat_id=query.message.chat.id,
@@ -127,7 +128,7 @@ def task_info(query: CallbackQuery) -> None:
 
 
 @bot.message_handler(func=lambda message: True)
-@admin_only
+@protected
 def add_task(message: Message) -> None:
     bot.send_message(
         chat_id=message.chat.id, text=constants.CRON_FORMAT, parse_mode="HTML"

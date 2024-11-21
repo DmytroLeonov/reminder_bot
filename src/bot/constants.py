@@ -23,9 +23,8 @@ EDIT_TASK_CRON_PREFIX = "edit_cron:"
 
 LIST_CALLBACK = "list"
 
-
 NO_BOT_TOKEN = "No BOT_TOKEN found in env."
-ADMIN_CHAT_ID = "No ADMIN_CHAT_ID found in env. You won't be able to use all features."
+NO_ALLOWED_CHAT_IDS = "No ALLOWED_CHAT_IDS found in env. You won't be able to use all features."
 
 START_RESPONSE = "Hello! Send me a task you want to be reminded of."
 NO_TASKS = "You have no tasks scheduled."

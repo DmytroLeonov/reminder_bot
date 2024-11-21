@@ -9,13 +9,14 @@ from src.bot.constants import COMMAND_NOT_ALLOWED
 
 logger = logging.getLogger(__name__)
 
-ADMIN_CHAT_ID = int(os.environ.get("ADMIN_CHAT_ID") or "-1")
+ALLOWED_CHAT_IDS_STR = (os.environ.get("ALLOWED_CHAT_IDS") or "-1").split(",")
+ALLOWED_CHAT_IDS = list(map(int, ALLOWED_CHAT_IDS_STR))
 
 
-def admin_only(func):
+def protected(func):
     @wraps(func)
     def wrapper(message: Message):
-        if message.from_user.id != ADMIN_CHAT_ID:
+        if message.chat.id not in ALLOWED_CHAT_IDS:
             logger.warning(
                 f"Attempt at unauthorized access in chat [{message.chat.id}]. "
                 f"User: @{message.from_user.username} {message.from_user.full_name}. "
