@@ -1,7 +1,8 @@
 from telebot import formatting
 
+CANCEL_COMMAND = "c"
 CRON_FORMAT = formatting.hcode(
-    "Input cron string according to the format or 'c' to cancel\n"
+    f"Input cron string according to the format or '{CANCEL_COMMAND}' to cancel\n"
     "┌───────  minute (0–59)\n"
     "│ ┌───────  hour (0–23)\n"
     "│ │ ┌─────── day/month (1–31)\n"
@@ -15,13 +16,13 @@ CRON_FORMAT = formatting.hcode(
 
 COMMAND_NOT_ALLOWED = "You are not allowed to use this command."
 
-INFO_TASK_PREFIX = "info_"
-EDIT_TASK_PREFIX = "edit_"
-DELETE_TASK_PREFIX = "delete_"
+INFO_TASK_PREFIX = "info:"
+DELETE_TASK_PREFIX = "delete:"
+EDIT_TASK_MESSAGE_PREFIX = "edit_message:"
+EDIT_TASK_CRON_PREFIX = "edit_cron:"
 
 LIST_CALLBACK = "list"
 
-CANCEL_COMMAND = "c"
 
 NO_BOT_TOKEN = "No BOT_TOKEN found in env."
 ADMIN_CHAT_ID = "No ADMIN_CHAT_ID found in env. You won't be able to use all features."

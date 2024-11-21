@@ -4,7 +4,7 @@ import uuid
 
 from src.bot import constants
 
-from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton
+from telebot.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
 
 from apscheduler.job import Job
 from apscheduler.triggers.cron import CronTrigger
@@ -40,12 +40,24 @@ def info_callback(job_id: str) -> str:
     return f"{constants.INFO_TASK_PREFIX}{job_id}"
 
 
-def edit_callback(job_id: str) -> str:
-    return f"{constants.EDIT_TASK_PREFIX}{job_id}"
+def edit_message_callback(job_id: str) -> str:
+    return f"{constants.EDIT_TASK_MESSAGE_PREFIX}{job_id}"
+
+
+def edit_cron_callback(job_id: str) -> str:
+    return f"{constants.EDIT_TASK_CRON_PREFIX}{job_id}"
 
 
 def delete_callback(job_id: str) -> str:
     return f"{constants.DELETE_TASK_PREFIX}{job_id}"
+
+
+def inline_keyboard_edit_message_button(job_id: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(text="✏️", callback_data=edit_message_callback(job_id))
+
+
+def inline_keyboard_edit_cron_button(job_id: str) -> InlineKeyboardButton:
+    return InlineKeyboardButton(text="🔄", callback_data=edit_cron_callback(job_id))
 
 
 def inline_keyboard_delete_button(job_id: str) -> InlineKeyboardButton:
@@ -54,6 +66,10 @@ def inline_keyboard_delete_button(job_id: str) -> InlineKeyboardButton:
 
 def inline_keyboard_back_button() -> InlineKeyboardButton:
     return InlineKeyboardButton(text="◀️", callback_data=constants.LIST_CALLBACK)
+
+
+def extract_job_id(query: CallbackQuery) -> str:
+    return query.data.split(":")[1]
 
 
 def generate_list_markup(jobs: list[Job]) -> InlineKeyboardMarkup:

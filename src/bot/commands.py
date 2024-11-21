@@ -8,7 +8,8 @@ from src.bot.utils import (
     get_crontab,
     generate_list_markup,
     inline_keyboard_delete_button,
-    inline_keyboard_back_button
+    inline_keyboard_back_button,
+    extract_job_id
 )
 from src.bot.security import admin_only
 
@@ -69,7 +70,7 @@ def list_tasks_callback(query: CallbackQuery) -> None:
     func=lambda query: query.data.startswith(constants.DELETE_TASK_PREFIX)
 )
 def delete_task(query: CallbackQuery) -> None:
-    job_id = query.data.split("_")[1]
+    job_id = extract_job_id(query)
     try:
         scheduler.remove_job(job_id)
     except JobLookupError:
@@ -96,7 +97,7 @@ def delete_task(query: CallbackQuery) -> None:
     func=lambda query: query.data.startswith(constants.INFO_TASK_PREFIX)
 )
 def task_info(query: CallbackQuery) -> None:
-    job_id = query.data.split("_")[1]
+    job_id = extract_job_id(query)
     job = scheduler.get_job(job_id)
     if not job:
         bot.answer_callback_query(
